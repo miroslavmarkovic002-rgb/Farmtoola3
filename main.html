@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Farmtoola3</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f0f4f1;
+            color: #333;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 750px;
+            width: 100%;
+            background: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+
+        h1 {
+            text-align: center;
+            color: #2e7d32;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .full-width {
+            grid-column: span 2;
+        }
+
+        .form-group {
+            margin-bottom: 12px;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: #444;
+            font-size: 14px;
+        }
+
+        select, input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .area-input-group {
+            display: flex;
+            gap: 8px;
+        }
+
+        .area-input-group input {
+            flex: 2;
+        }
+
+        .area-input-group select {
+            flex: 1;
+        }
+
+        select:focus, input:focus {
+            border-color: #2e7d32;
+            outline: none;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #2e7d32;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s;
+            margin-top: 15px;
+        }
+
+        button:hover {
+            background-color: #1b5e20;
+        }
+
+        .result-box {
+            margin-top: 25px;
+            padding: 20px;
+            background-color: #e8f5e9;
+            border-left: 5px solid #2e7d32;
+            border-radius: 6px;
+            display: none;
+        }
+
+        .result-box h2 {
+            font-size: 18px;
+            color: #1b5e20;
+            margin-bottom: 12px;
+        }
+
+        .result-item {
+            margin-bottom: 10px;
+            font-size: 15px;
+            line-height: 1.5;
+        }
+
+        .result-item strong {
+            color: #1b5e20;
+        }
+
+        .warning {
+            background-color: #fff3cd;
+            color: #856404;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+            font-size: 14px;
+            border: 1px solid #ffeeba;
+        }
+
+        .note {
+            margin-top: 15px;
+            font-size: 12px;
+            color: #666;
+            font-style: italic;
+        }
+
+        @media (max-width: 600px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            .full-width {
+                grid-column: span 1;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Farmtoola3</h1>
+    
+    <div class="form-grid">
+        <div class="form-group full-width">
+            <label for="cropSelect">Chọn loại cây trồng:</label>
+            <select id="cropSelect">
+                <option value="khoai_tay">Khoai tây</option>
+                <option value="khoai_san">Khoai sắn</option>
+                <option value="khoai_lang">Khoai lang</option>
+                <option value="ca_rot">Cà rốt</option>
+                <option value="cu_den">Củ dền</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="plantDate">Ngày trồng hoặc gieo hạt:</label>
+            <input type="date" id="plantDate">
+        </div>
+
+        <div class="form-group">
+            <label for="areaInput">Diện tích đất canh tác:</label>
+            <div class="area-input-group">
+                <input type="number" id="areaInput" placeholder="Nhập diện tích" min="0.1" step="any">
+                <select id="unitSelect">
+                    <option value="m2">m²</option>
+                    <option value="ha">ha</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="phInput">Độ pH của đất:</label>
+            <input type="number" id="phInput" placeholder="Ví dụ: 6.5" min="3" max="9" step="0.1" value="6.5">
+        </div>
+
+        <div class="form-group">
+            <label for="tempInput">Nhiệt độ ngoài trời (°C):</label>
+            <input type="number" id="tempInput" placeholder="Ví dụ: 28" step="0.1" value="28">
+        </div>
+
+        <div class="form-group full-width">
+            <label for="humidityInput">Độ ẩm không khí (%):</label>
+            <input type="number" id="humidityInput" placeholder="Ví dụ: 75" min="0" max="100" value="75">
+        </div>
+    </div>
+
+    <button onclick="calculate()">Tính Kết Quả & Phân Tích Điều Kiện</button>
+
+    <div class="result-box" id="resultBox">
+        <h2>Kết Quả & Khuyến Nghị Trồng Trọt:</h2>
+        <div class="result-item" id="resCrop"></div>
+        <div class="result-item" id="resHarvestDate"></div>
+        <div class="result-item" id="resWaterDay"></div>
+        <div class="result-item" id="resWaterTotal"></div>
+        <div class="result-item" id="resYield"></div>
+        
+        <div id="envAnalysis"></div>
+
+        <div class="note">* Lưu ý: Lượng nước tưới đã được điều chỉnh tự động theo nhiệt độ và độ ẩm môi trường bạn đã nhập.</div>
+    </div>
+</div>
+
+<script>
+    // Tự động chọn ngày hôm nay
+    document.getElementById('plantDate').valueAsDate = new Date();
+
+    // Dữ liệu kỹ thuật chuẩn nông nghiệp
+    // Nước: lit/m2/ngay | Năng suất: kg/m2 | pH tối ưu (min-max) | Temp tối ưu (°C)
+    const cropData = {
+        khoai_tay: {
+            name: "Khoai tây",
+            waterMin: 4, waterMax: 6,
+            daysMin: 90, daysMax: 105,
+            yieldMin: 2.0, yieldMax: 3.0,
+            phMin: 5.5, phMax: 6.5,
+            tempMin: 15, tempMax: 24
+        },
+        khoai_san: {
+            name: "Khoai sắn (Sắn / Khoai mì)",
+            waterMin: 3, waterMax: 5,
+            daysMin: 240, daysMax: 300,
+            yieldMin: 2.5, yieldMax: 4.0,
+            phMin: 5.5, phMax: 7.0,
+            tempMin: 22, tempMax: 30
+        },
+        khoai_lang: {
+            name: "Khoai lang",
+            waterMin: 3.5, waterMax: 5,
+            daysMin: 100, daysMax: 120,
+            yieldMin: 1.5, yieldMax: 2.5,
+            phMin: 5.5, phMax: 6.8,
+            tempMin: 20, tempMax: 30
+        },
+        ca_rot: {
+            name: "Cà rốt",
+            waterMin: 3, waterMax: 4.5,
+            daysMin: 80, daysMax: 100,
+            yieldMin: 3.0, yieldMax: 4.0,
+            phMin: 6.0, phMax: 7.0,
+            tempMin: 16, tempMax: 22
+        },
+        cu_den: {
+            name: "Củ dền",
+            waterMin: 3, waterMax: 4,
+            daysMin: 60, daysMax: 75,
+            yieldMin: 2.0, yieldMax: 3.0,
+            phMin: 6.0, phMax: 7.5,
+            tempMin: 15, tempMax: 25
+        }
+    };
+
+    function formatDate(date) {
+        const d = date.getDate().toString().padStart(2, '0');
+        const m = (date.getMonth() + 1).toString().padStart(2, '0');
+        const y = date.getFullYear();
+        return `${d}/${m}/${y}`;
+    }
+
+    function calculate() {
+        const cropKey = document.getElementById('cropSelect').value;
+        const plantDateVal = document.getElementById('plantDate').value;
+        const rawArea = parseFloat(document.getElementById('areaInput').value);
+        const unit = document.getElementById('unitSelect').value;
+        const ph = parseFloat(document.getElementById('phInput').value);
+        const temp = parseFloat(document.getElementById('tempInput').value);
+        const humidity = parseFloat(document.getElementById('humidityInput').value);
+
+        if (!plantDateVal) {
+            alert('Vui lòng chọn ngày trồng!');
+            return;
+        }
+        if (isNaN(rawArea) || rawArea <= 0) {
+            alert('Vui lòng nhập diện tích hợp lệ!');
+            return;
+        }
+
+        // Quy đổi diện tích ra m2 để tính toán chuẩn
+        const areaInM2 = (unit === 'ha') ? rawArea * 10000 : rawArea;
+        const crop = cropData[cropKey];
+
+        // 1. Ngày thu hoạch
+        const plantDate = new Date(plantDateVal);
+        const harvestMin = new Date(plantDate);
+        harvestMin.setDate(harvestMin.getDate() + crop.daysMin);
+
+        const harvestMax = new Date(plantDate);
+        harvestMax.setDate(harvestMax.getDate() + crop.daysMax);
+
+        // 2. Tự động điều chỉnh lượng nước theo Nhiệt độ & Độ ẩm
+        let tempMultiplier = 1.0;
+        if (temp > 32) tempMultiplier += 0.2;       // Nắng nóng tăng 20% nước
+        else if (temp < 18) tempMultiplier -= 0.15; // Lạnh giảm 15% nước
+
+        if (humidity < 40) tempMultiplier += 0.1;   // Không khí khô tăng 10% nước
+        else if (humidity > 85) tempMultiplier -= 0.1; // Độ ẩm quá cao giảm 10% nước
+
+        const adjustedWaterMin = crop.waterMin * tempMultiplier;
+        const adjustedWaterMax = crop.waterMax * tempMultiplier;
+
+        // Tính nước hàng ngày (Lít hoặc m3)
+        const dailyWaterMinL = Math.round(adjustedWaterMin * areaInM2);
+        const dailyWaterMaxL = Math.round(adjustedWaterMax * areaInM2);
+        
+        // Tính tổng nước cả vụ
+        const avgDays = (crop.daysMin + crop.daysMax) / 2;
+        const totalWaterMinM3 = Math.round((dailyWaterMinL * crop.daysMin) / 1000);
+        const totalWaterMaxM3 = Math.round((dailyWaterMaxL * crop.daysMax) / 1000);
+
+        // 3. Năng suất (kg hoặc Tấn)
+        const totalYieldMinKg = crop.yieldMin * areaInM2;
+        const totalYieldMaxKg = crop.yieldMax * areaInM2;
+
+        // Hiển thị kết quả thu hoạch & Nước tưới
+        document.getElementById('resCrop').innerHTML = `<strong>Loại cây chọn:</strong> ${crop.name}`;
+        document.getElementById('resHarvestDate').innerHTML = `<strong>Thời gian thu hoạch:</strong> Từ <b>${formatDate(harvestMin)}</b> đến <b>${formatDate(harvestMax)}</b> (chu kỳ khoảng ${crop.daysMin} - ${crop.daysMax} ngày)`;
+        
+        document.getElementById('resWaterDay').innerHTML = `<strong>Lượng nước tưới hàng ngày:</strong> Khoảng <b>${dailyWaterMinL.toLocaleString()} - ${dailyWaterMaxL.toLocaleString()} lít/ngày</b> (${(dailyWaterMinL/1000).toFixed(1)} - ${(dailyWaterMaxL/1000).toFixed(1)} m³/ngày).`;
+
+        document.getElementById('resWaterTotal').innerHTML = `<strong>Tổng nhu cầu nước cho cả vụ:</strong> <b>${totalWaterMinM3.toLocaleString()} - ${totalWaterMaxM3.toLocaleString()} m³</b> nước.`;
+
+        let yieldText = "";
+        if (totalYieldMaxKg >= 1000) {
+            yieldText = `<b>${(totalYieldMinKg/1000).toFixed(2)} - ${(totalYieldMaxKg/1000).toFixed(2)} Tấn</b> (${Math.round(totalYieldMinKg).toLocaleString()} - ${Math.round(totalYieldMaxKg).toLocaleString()} kg)`;
+        } else {
+            yieldText = `<b>${Math.round(totalYieldMinKg)} - ${Math.round(totalYieldMaxKg)} kg</b>`;
+        }
+        document.getElementById('resYield').innerHTML = `<strong>Năng suất dự kiến:</strong> ${yieldText}`;
+
+        // 4. Phân tích điều kiện Đất & Môi trường
+        let warnings = [];
+
+        // Đánh giá pH
+        if (!isNaN(ph)) {
+            if (ph < crop.phMin) {
+                warnings.push(`- <b>Độ pH (${ph}):</b> Đất bị chua so với cây ${crop.name} (thích hợp: ${crop.phMin} - ${crop.phMax}). Nên bón vôi nông nghiệp kết hợp với bổ sung phân hữu cơ và hạn chế phân hóa học để giảm độ chua.`);
+            } else if (ph > crop.phMax) {
+                warnings.push(`- <b>Độ pH (${ph}):</b> Đất bị kiềm so với cây ${crop.name} (thích hợp: ${crop.phMin} - ${crop.phMax}). Nên bón thêm phân hữu cơ hoặc phân có tính acid và lưu huỳnh để giảm độ kiềm.`);
+            } else {
+                warnings.push(`- <b>Độ pH (${ph}):</b> Rất tốt và phù hợp để cây phát triển bình thường.`);
+            }
+        }
+
+        // Đánh giá Nhiệt độ
+        if (!isNaN(temp)) {
+            if (temp > crop.tempMax) {
+                warnings.push(`- <b>Nhiệt độ (${temp}°C):</b> Cao hơn nhiệt độ để cây phát triển bình thường (thích hợp: ${crop.tempMin}°C - ${crop.tempMax}°C).`);
+            } else if (temp < crop.tempMin) {
+                warnings.push(`- <b>Nhiệt độ (${temp}°C):</b> Thấp hơn nhiệt độ để cây phát triển bình thường (thích hợp: ${crop.tempMin}°C - ${crop.tempMax}°C).`);
+            } else {
+                warnings.push(`- <b>Nhiệt độ (${temp})°C:</b> Nhiệt độ phù hợp để cây phát triển bình thường.`);
+            }
+        }
+
+        // Đánh giá Độ ẩm
+        if (!isNaN(humidity)) {
+            if (humidity > 85) {
+                warnings.push(`- <b>Độ ẩm (${humidity}%):</b> Độ ẩm cao. Nguy cơ nấm bệnh mốc sương hoặc thối củ gia tăng, chú ý thoát nước tốt.`);
+            } else if (humidity < 40) {
+                warnings.push(`- <b>Độ ẩm (${humidity}%):</b> Độ ẩm thấp. Cần chia nhỏ các lần tưới trong ngày để duy trì ẩm độ cho củ.`);
+            }else {
+                warnings.push(`- <b>Độ ẩm (${humidity}%):</b> Độ ẩm phù hợp để cây phát triển bình thường.`);
+            }
+        }
+
+        const envBox = document.getElementById('envAnalysis');
+        if (warnings.length > 0) {
+            envBox.innerHTML = `<div class="warning"><strong>Đánh giá điều kiện môi trường:</strong><br>${warnings.join('<br>')}</div>`;
+        } else {
+            envBox.innerHTML = '';
+        }
+
+        document.getElementById('resultBox').style.display = 'block';
+    }
+</script>
+
+</body>
+</html>
